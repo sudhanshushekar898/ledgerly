@@ -1,0 +1,19 @@
+title = "Ledgerly secret scanning"
+
+# Keep every default gitleaks rule.
+[extend]
+useDefault = true
+
+# Synthetic passwords used only by tests and the local compose stack. Listed exactly so any other
+# password-like string is still reported.
+[allowlist]
+description = "Documented synthetic test and local-stack passwords"
+regexTarget = "secret"
+regexes = [
+  '''^Correct-Horse-Battery-9$''',
+  '''^Operator-Passphrase-2026$''',
+  '''^Local-Operator-Pass-2026$''',
+  '''^Demo-Wallet-Pass-2026$''',
+  # A fake Idempotency-Key in a frontend test (not a credential)
+  '''^key-12345678$''',
+]

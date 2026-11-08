@@ -1,0 +1,8 @@
+ledgerly:
+  security:
+    jwt:
+      allow-ephemeral-key: true
+  # Synthetic operator account for tests (allowlisted in .gitleaks.toml). One shared config = one Spring context.
+  bootstrap:
+    admin-email: operator@example.com
+    admin-password: Operator-Passphrase-2026

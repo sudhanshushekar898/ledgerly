@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: ledgerly
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+    default-property-inclusion: non_null
+
+server:
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  metrics:
+    tags:
+      application: ledgerly
+    distribution:
+      # Histogram buckets so Prometheus can compute p95/p99 across instances.
+      percentiles-histogram:
+        http.server.requests: true
+
+ledgerly:
+  security:
+    jwt:
+      # PEM, PKCS#8 private key and X.509 public key. Required unless allow-ephemeral-key is true (local/test only).
+      private-key: ${JWT_PRIVATE_KEY:}
+      public-key: ${JWT_PUBLIC_KEY:}
+
+---
+# Kafka (ADR-006). Producer: wait for the broker to persist, never write duplicates on retry.
+# Consumers read Strings and parse JSON themselves, so a malformed message can be routed to the DLT.
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: 10000
+        request.timeout.ms: 5000
+    consumer:
+      auto-offset-reset: earliest
+      properties:
+        isolation.level: read_committed

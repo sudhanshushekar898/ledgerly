@@ -1,0 +1,10 @@
+# Local profile: matches docker-compose.yml. Throwaway, local-only credentials.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/ledgerly
+    username: ledgerly
+    password: ledgerly
+ledgerly:
+  security:
+    jwt:
+      allow-ephemeral-key: true
